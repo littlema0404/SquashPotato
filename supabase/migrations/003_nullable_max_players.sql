@@ -1,1 +1,0 @@
-ALTER TABLE sessions ALTER COLUMN max_players DROP NOT NULL;
