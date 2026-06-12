@@ -104,7 +104,7 @@ export default function LoginPage() {
       provider: 'custom:line',
       options: {
         redirectTo: `${window.location.origin}/auth/callback`,
-        scopes: 'profile openid email',
+        scopes: 'profile openid',
       },
     })
   }
