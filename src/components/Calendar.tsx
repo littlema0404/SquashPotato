@@ -120,6 +120,10 @@ export default function Calendar({ sessions, userId }: CalendarProps) {
   }, [month, fetchMonthSessions])
 
   useEffect(() => {
+    setExtraSessions([])
+  }, [sessions])
+
+  useEffect(() => {
     const handleReset = () => {
       setMonth(today)
       setSelectedDate(today)
