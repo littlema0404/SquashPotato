@@ -11,7 +11,6 @@ CREATE TABLE profiles (
   avatar_url TEXT,
   is_admin BOOLEAN DEFAULT FALSE,
   status user_status DEFAULT 'pending',
-  phone TEXT,
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
@@ -24,7 +23,7 @@ CREATE TABLE sessions (
   end_time TIME NOT NULL,
   location TEXT NOT NULL,
   court_count INT DEFAULT 1,
-  max_players INT NOT NULL,
+  max_players INT,
   description TEXT,
   created_by UUID REFERENCES profiles(id),
   status session_status DEFAULT 'open',
@@ -52,6 +51,15 @@ ALTER TABLE profiles ENABLE ROW LEVEL SECURITY;
 ALTER TABLE sessions ENABLE ROW LEVEL SECURITY;
 ALTER TABLE registrations ENABLE ROW LEVEL SECURITY;
 
+-- 安全函數（SECURITY DEFINER 繞過 RLS 遞迴）
+CREATE OR REPLACE FUNCTION public.check_is_admin(uid UUID)
+RETURNS BOOLEAN AS $$
+  SELECT COALESCE(
+    (SELECT is_admin FROM profiles WHERE id = uid),
+    FALSE
+  );
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
+
 -- profiles RLS
 CREATE POLICY "Users can view own profile" ON profiles
   FOR SELECT USING (auth.uid() = id);
@@ -59,15 +67,11 @@ CREATE POLICY "Users can view own profile" ON profiles
 CREATE POLICY "Users can view approved users" ON profiles
   FOR SELECT USING (status = 'approved');
 
-CREATE POLICY "Admins can view all profiles" ON profiles
-  FOR SELECT USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE)
-  );
+CREATE POLICY "Users can view all profiles via admin" ON profiles
+  FOR SELECT USING (public.check_is_admin(auth.uid()));
 
 CREATE POLICY "Admins can update profiles" ON profiles
-  FOR UPDATE USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE)
-  );
+  FOR UPDATE USING (public.check_is_admin(auth.uid()));
 
 CREATE POLICY "Users can insert own profile" ON profiles
   FOR INSERT WITH CHECK (auth.uid() = id);
@@ -79,9 +83,7 @@ CREATE POLICY "Approved users can view sessions" ON sessions
   );
 
 CREATE POLICY "Admins can manage sessions" ON sessions
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE)
-  );
+  FOR ALL USING (public.check_is_admin(auth.uid()));
 
 -- registrations RLS
 CREATE POLICY "Approved users can view registrations" ON registrations
@@ -99,6 +101,4 @@ CREATE POLICY "Users can cancel own registration" ON registrations
   FOR UPDATE USING (auth.uid() = user_id);
 
 CREATE POLICY "Admins can manage registrations" ON registrations
-  FOR ALL USING (
-    EXISTS (SELECT 1 FROM profiles WHERE id = auth.uid() AND is_admin = TRUE)
-  );
+  FOR ALL USING (public.check_is_admin(auth.uid()));
