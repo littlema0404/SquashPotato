@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useState, type ReactNode } from 'react'
+import { useEffect, useState } from 'react'
 import Image from 'next/image'
 import { Ban } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
@@ -9,27 +9,6 @@ import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent } from '@/components/ui/card'
 import { Spinner } from '@/components/ui/spinner'
-
-function LoginShell({ children }: { children: ReactNode }) {
-  return (
-    <div className="flex min-h-[100dvh] items-center justify-center px-4">
-      <div className="w-full max-w-sm text-center">
-        <div className="mx-auto mb-4 flex size-20 items-center justify-center overflow-hidden rounded-3xl">
-          <Image
-            src="/logo.png"
-            alt="JJSquash Logo"
-            width={80}
-            height={80}
-            className="object-cover"
-            priority
-          />
-        </div>
-        <h1 className="text-2xl font-semibold text-foreground">JJSquash</h1>
-        {children}
-      </div>
-    </div>
-  )
-}
 
 function LiffStatusScreen({
   message,
