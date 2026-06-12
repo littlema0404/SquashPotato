@@ -7,10 +7,12 @@ import UserManagement from './UserManagement'
 
 const AUTH_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET)
 
-const supabaseAdmin = createAdminClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+async function getSupabaseAdmin() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function getLiffUserId(): Promise<string | null> {
   try {
@@ -48,6 +50,8 @@ export default async function AdminUsersPage() {
   if (!profile || !profile.is_admin) {
     redirect('/')
   }
+
+  const supabaseAdmin = await getSupabaseAdmin()
 
   const { data: users } = await supabaseAdmin
     .from('profiles')

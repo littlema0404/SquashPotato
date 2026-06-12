@@ -7,10 +7,12 @@ import LoginPage from '@/components/LoginPage'
 
 const AUTH_SECRET = new TextEncoder().encode(process.env.AUTH_SECRET)
 
-const supabaseAdmin = createAdminClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-)
+async function getSupabaseAdmin() {
+  return createAdminClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.SUPABASE_SERVICE_ROLE_KEY!
+  )
+}
 
 async function getLiffUserId(): Promise<string | null> {
   try {
@@ -48,6 +50,8 @@ export default async function HomePage() {
   if (!profile || profile.status !== 'approved') {
     return <LoginPage />
   }
+
+  const supabaseAdmin = await getSupabaseAdmin()
 
   const now = new Date()
   const startDate = new Date(now.getFullYear(), now.getMonth() - 1, 1).toISOString()
