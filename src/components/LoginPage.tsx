@@ -136,15 +136,15 @@ export default function LoginPage() {
     <div className="flex min-h-[100dvh] items-center justify-center px-4">
       <div className="w-full max-w-sm">
         <div className="mb-8 text-center">
-          <div className="mx-auto mb-4 flex size-20 items-center justify-center overflow-hidden rounded-3xl">
-            <Image
-              src="/logo.png"
-              alt="JJSquash Logo"
-              width={80}
-              height={80}
-              className="object-cover"
-              priority
-            />
+          <div className="mx-auto mb-4 flex size-20 items-center justify-center overflow-hidden">
+          <Image
+            src="/logo.png"
+            alt="JJSquash Logo"
+            width={80}
+            height={80}
+            className="rounded-3xl object-cover"
+            priority
+          />
           </div>
           <h1 className="text-2xl font-semibold text-foreground">JJSquash</h1>
           <p className="mt-1 text-muted-foreground">打球登記小本本</p>
